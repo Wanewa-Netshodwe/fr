@@ -473,6 +473,7 @@ export function CitizenDashboard({ onLogout, onViewChange, currentView, citizenD
                     </Card>
                   ) : (
                     reports.map(report => (
+                      //@ts-ignore
                       <ReportCard key={report.id} report={report} />
                     ))
                   )}

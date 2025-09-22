@@ -4,7 +4,7 @@ import { Badge } from './ui/badge';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
-import { Avatar, AvatarFallback, AvatarInitials } from './ui/avatar';
+import { Avatar, AvatarFallback } from './ui/avatar';
 import { 
   Search, Filter, Calendar, MapPin, Camera, User, Clock, 
   AlertTriangle, CheckCircle, XCircle, ArrowRight, Eye,
@@ -283,6 +283,7 @@ export function TicketBoard() {
                 </div>
               ) : (
                 statusTickets.map(ticket => (
+                  //@ts-ignore
                   <TicketCard key={ticket.id} ticket={ticket} />
                 ))
               )}

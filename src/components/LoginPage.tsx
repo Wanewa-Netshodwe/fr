@@ -17,29 +17,26 @@ import {
   SelectValue,
 } from "./ui/select";
 import { Alert, AlertDescription } from "./ui/alert";
-import {
-  Shield,
-  Lock,
-  User,
-  Droplets,
-  AlertTriangle,
-} from "lucide-react";
+import { Shield, Lock, User, Droplets, AlertTriangle } from "lucide-react";
 import { UserRole } from "../App";
+import { useLocation, useNavigate } from "react-router";
 
 interface LoginPageProps {
   onLogin: (role: UserRole) => void;
 }
 
 export function LoginPage({ onLogin }: LoginPageProps) {
+  const state = useLocation();
+  const navigate = useNavigate();
+  console.log("my state", state.state.role);
+
   const [credentials, setCredentials] = useState({
     username: "",
     password: "",
     otp: "",
-    role: "" as "admin" | "operator" | "",
+    role: state.state.role,
   });
-  const [step, setStep] = useState<"credentials" | "otp">(
-    "credentials",
-  );
+  const [step, setStep] = useState<"credentials" | "otp">("credentials");
   const [error, setError] = useState("");
 
   const handleCredentialsSubmit = (e: React.FormEvent) => {
@@ -47,11 +44,7 @@ export function LoginPage({ onLogin }: LoginPageProps) {
     setError("");
 
     // Demo validation
-    if (
-      !credentials.username ||
-      !credentials.password ||
-      !credentials.role
-    ) {
+    if (!credentials.username || !credentials.password || !credentials.role) {
       setError("Please fill in all fields");
       return;
     }
@@ -60,7 +53,7 @@ export function LoginPage({ onLogin }: LoginPageProps) {
     if (credentials.role === "admin") {
       setStep("otp");
     } else {
-      onLogin("operator");
+      navigate("/operator-portal");
     }
   };
 
@@ -75,7 +68,7 @@ export function LoginPage({ onLogin }: LoginPageProps) {
 
     // Demo OTP validation
     if (credentials.otp === "123456") {
-      onLogin("admin");
+      navigate("/admin-dashboard");
     } else {
       setError("Invalid OTP code");
     }
@@ -92,9 +85,7 @@ export function LoginPage({ onLogin }: LoginPageProps) {
           <h1 className="text-3xl font-bold text-white mb-2">
             HydroHack Solution
           </h1>
-          <p className="text-blue-100">
-            Secure Government Portal
-          </p>
+          <p className="text-blue-100">Secure Government Portal</p>
         </div>
 
         <Card className="shadow-xl border-0">
@@ -127,16 +118,11 @@ export function LoginPage({ onLogin }: LoginPageProps) {
             )}
 
             {step === "credentials" ? (
-              <form
-                onSubmit={handleCredentialsSubmit}
-                className="space-y-4"
-              >
+              <form onSubmit={handleCredentialsSubmit} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="role">Access Level</Label>
                   <Select
-                    onValueChange={(
-                      value: "admin" | "operator",
-                    ) =>
+                    onValueChange={(value: "admin" | "operator") =>
                       setCredentials({
                         ...credentials,
                         role: value,
@@ -147,28 +133,27 @@ export function LoginPage({ onLogin }: LoginPageProps) {
                       <SelectValue placeholder="Select your access level" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="admin">
-                        <div className="flex items-center space-x-2">
-                          <Shield className="h-4 w-4 text-red-500" />
-                          <span>
-                            Government Admin (Confidential)
-                          </span>
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="operator">
-                        <div className="flex items-center space-x-2">
-                          <User className="h-4 w-4 text-blue-500" />
-                          <span>Car Wash Operator</span>
-                        </div>
-                      </SelectItem>
+                      {state.state.role === "admin" ? (
+                        <SelectItem value="admin">
+                          <div className="flex items-center space-x-2">
+                            <Shield className="h-4 w-4 text-red-500" />
+                            <span>Government Admin (Confidential)</span>
+                          </div>
+                        </SelectItem>
+                      ) : (
+                        <SelectItem value="operator">
+                          <div className="flex items-center space-x-2">
+                            <User className="h-4 w-4 text-blue-500" />
+                            <span>Car Wash Operator</span>
+                          </div>
+                        </SelectItem>
+                      )}
                     </SelectContent>
                   </Select>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="username">
-                    Username / Employee ID
-                  </Label>
+                  <Label htmlFor="username">Username / Employee ID</Label>
                   <Input
                     id="username"
                     type="text"
@@ -205,10 +190,9 @@ export function LoginPage({ onLogin }: LoginPageProps) {
                   <Alert className="border-red-200 bg-red-50">
                     <Shield className="h-4 w-4 text-red-600" />
                     <AlertDescription className="text-red-800">
-                      <strong>Confidential Access:</strong> This
-                      area contains sensitive municipal data.
-                      Unauthorized access is prohibited and
-                      monitored.
+                      <strong>Confidential Access:</strong> This area contains
+                      sensitive municipal data. Unauthorized access is
+                      prohibited and monitored.
                     </AlertDescription>
                   </Alert>
                 )}
@@ -217,16 +201,11 @@ export function LoginPage({ onLogin }: LoginPageProps) {
                   type="submit"
                   className="w-full bg-blue-600 hover:bg-blue-700"
                 >
-                  {credentials.role === "admin"
-                    ? "Continue to 2FA"
-                    : "Sign In"}
+                  {credentials.role === "admin" ? "Continue to 2FA" : "Sign In"}
                 </Button>
               </form>
             ) : (
-              <form
-                onSubmit={handleOtpSubmit}
-                className="space-y-4"
-              >
+              <form onSubmit={handleOtpSubmit} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="otp">6-Digit OTP Code</Label>
                   <Input
@@ -254,9 +233,7 @@ export function LoginPage({ onLogin }: LoginPageProps) {
                   <button
                     type="button"
                     className="text-blue-600 hover:underline mt-2"
-                    onClick={() =>
-                      alert("OTP resent (Demo: use 123456)")
-                    }
+                    onClick={() => alert("OTP resent (Demo: use 123456)")}
                   >
                     Resend OTP
                   </button>

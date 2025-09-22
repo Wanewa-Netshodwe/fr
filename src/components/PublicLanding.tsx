@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { Button } from "./ui/button";
 import {
   Card,
@@ -35,6 +35,7 @@ import {
 } from "lucide-react";
 import { UserRole, AuthView } from "../App";
 import { PublicSensorView } from "./PublicSensorView";
+import { useNavigate } from "react-router";
 
 interface PublicLandingProps {
   onRoleChange: (role: UserRole) => void;
@@ -49,12 +50,9 @@ export function PublicLanding({
 }: PublicLandingProps) {
   // Show public sensor map if requested
   if (currentView === "sensors") {
-    return (
-      <PublicSensorView
-        onBack={() => onViewChange("landing")}
-      />
-    );
+    return <PublicSensorView onBack={() => onViewChange("landing")} />;
   }
+  const navigate = useNavigate();
   const [reportForm, setReportForm] = useState({
     location: "",
     issueType: "",
@@ -62,12 +60,27 @@ export function PublicLanding({
     anonymous: false,
   });
   const [submitted, setSubmitted] = useState(false);
+  const handleDivClick = () => {
+    if (photo) {
+      setPhoto(null);
+    } else {
+      // Otherwise, open file picker
+      fileInputRef.current?.click();
+    }
+  };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setPhoto(e.target.files[0]);
+    }
+  };
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitted(true);
     setTimeout(() => setSubmitted(false), 3000);
   };
+  const [photo, setPhoto] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-200 to-blue-50">
@@ -83,9 +96,7 @@ export function PublicLanding({
                 <h1 className="text-xl font-semibold text-gray-900">
                   HydroHack Solutions
                 </h1>
-                <p className="text-sm text-gray-600">
-                  Metsi Ke Bophelo
-                </p>
+                <p className="text-sm text-gray-600">Metsi Ke Bophelo</p>
               </div>
             </div>
 
@@ -93,8 +104,7 @@ export function PublicLanding({
               <Button
                 variant="ghost"
                 onClick={() => {
-                  onRoleChange("citizen");
-                  onViewChange("login");
+                  navigate("/login-citizen", { state: { role: "login" } });
                 }}
                 className="text-blue-600 hover:bg-blue-50"
               >
@@ -104,8 +114,7 @@ export function PublicLanding({
               <Button
                 variant="outline"
                 onClick={() => {
-                  onRoleChange("citizen");
-                  onViewChange("register");
+                  navigate("/login-citizen", { state: { role: "register" } });
                 }}
                 className="text-blue-600 border-blue-600 hover:bg-blue-50"
               >
@@ -114,14 +123,16 @@ export function PublicLanding({
               </Button>
               <Button
                 variant="outline"
-                onClick={() => onRoleChange("operator")}
+                onClick={() =>
+                  navigate("/login", { state: { role: "operator" } })
+                }
                 className="text-green-600 border-green-600 hover:bg-green-50"
               >
                 Car Wash Portal
               </Button>
               <Button
                 variant="outline"
-                onClick={() => onRoleChange("admin")}
+                onClick={() => navigate("/login", { state: { role: "admin" } })}
                 className="text-red-600 border-red-600 hover:bg-red-50"
               >
                 <Shield className="h-4 w-4 mr-2" />
@@ -139,9 +150,9 @@ export function PublicLanding({
             Protecting Tshwane's Water Resources
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
-            An integrated platform monitoring water usage at car
-            washes, supporting the informal economy while
-            ensuring environmental compliance.
+            An integrated platform monitoring water usage at car washes,
+            supporting the informal economy while ensuring environmental
+            compliance.
           </p>
 
           {/* Hero Action Buttons */}
@@ -159,8 +170,7 @@ export function PublicLanding({
               variant="outline"
               className="border-blue-600 text-blue-600 hover:bg-blue-50 px-8 py-3"
               onClick={() => {
-                onRoleChange("citizen");
-                onViewChange("register");
+                navigate("/login-citizen");
               }}
             >
               <UserPlus className="h-5 w-5 mr-2" />
@@ -177,12 +187,8 @@ export function PublicLanding({
                 </div>
                 <TrendingUp className="h-4 w-4 text-green-500" />
               </div>
-              <h3 className="text-2xl font-bold text-blue-600 mb-1">
-                247
-              </h3>
-              <p className="text-sm text-gray-600">
-                Registered Car Washes
-              </p>
+              <h3 className="text-2xl font-bold text-blue-600 mb-1">247</h3>
+              <p className="text-sm text-gray-600">Registered Car Washes</p>
             </div>
 
             <div className="bg-white rounded-lg shadow-sm p-6 border">
@@ -192,12 +198,8 @@ export function PublicLanding({
                 </div>
                 <TrendingUp className="h-4 w-4 text-green-500" />
               </div>
-              <h3 className="text-2xl font-bold text-green-600 mb-1">
-                1,247
-              </h3>
-              <p className="text-sm text-gray-600">
-                Issues Resolved
-              </p>
+              <h3 className="text-2xl font-bold text-green-600 mb-1">1,247</h3>
+              <p className="text-sm text-gray-600">Issues Resolved</p>
             </div>
 
             <div className="bg-white rounded-lg shadow-sm p-6 border">
@@ -207,12 +209,8 @@ export function PublicLanding({
                 </div>
                 <TrendingUp className="h-4 w-4 text-green-500" />
               </div>
-              <h3 className="text-2xl font-bold text-blue-600 mb-1">
-                15.4M
-              </h3>
-              <p className="text-sm text-gray-600">
-                Liters Water Saved
-              </p>
+              <h3 className="text-2xl font-bold text-blue-600 mb-1">15.4M</h3>
+              <p className="text-sm text-gray-600">Liters Water Saved</p>
             </div>
 
             <div className="bg-white rounded-lg shadow-sm p-6 border">
@@ -222,12 +220,8 @@ export function PublicLanding({
                 </div>
                 <TrendingUp className="h-4 w-4 text-green-500" />
               </div>
-              <h3 className="text-2xl font-bold text-green-600 mb-1">
-                2,850
-              </h3>
-              <p className="text-sm text-gray-600">
-                Active Citizens
-              </p>
+              <h3 className="text-2xl font-bold text-green-600 mb-1">2,850</h3>
+              <p className="text-sm text-gray-600">Active Citizens</p>
             </div>
           </div>
 
@@ -241,8 +235,8 @@ export function PublicLanding({
                 Real-Time Monitoring
               </h3>
               <p className="text-gray-600 text-center">
-                IoT sensors track water usage and detect
-                anomalies in real-time across Tshwane
+                IoT sensors track water usage and detect anomalies in real-time
+                across Tshwane
               </p>
             </div>
 
@@ -254,8 +248,8 @@ export function PublicLanding({
                 Community Empowerment
               </h3>
               <p className="text-gray-600 text-center">
-                Supporting informal car washes while building
-                sustainable water practices
+                Supporting informal car washes while building sustainable water
+                practices
               </p>
             </div>
 
@@ -263,12 +257,10 @@ export function PublicLanding({
               <div className="bg-blue-100 p-4 rounded-full mb-4">
                 <CheckCircle className="h-8 w-8 text-blue-600" />
               </div>
-              <h3 className="text-lg font-semibold mb-2">
-                Smart Compliance
-              </h3>
+              <h3 className="text-lg font-semibold mb-2">Smart Compliance</h3>
               <p className="text-gray-600 text-center">
-                Automated compliance tracking with incentives
-                for green practices
+                Automated compliance tracking with incentives for green
+                practices
               </p>
             </div>
           </div>
@@ -298,9 +290,8 @@ export function PublicLanding({
                   Report Water Issues
                 </CardTitle>
                 <CardDescription>
-                  Help us monitor water usage and waste
-                  management in your area. Your reports help
-                  protect our water resources.
+                  Help us monitor water usage and waste management in your area.
+                  Your reports help protect our water resources.
                 </CardDescription>
               </CardHeader>
 
@@ -321,15 +312,12 @@ export function PublicLanding({
                       variant="secondary"
                       className="bg-green-50 text-green-700"
                     >
-                      Your report has been received and will be
-                      reviewed within 24 hours
+                      Your report has been received and will be reviewed within
+                      24 hours
                     </Badge>
                   </div>
                 ) : (
-                  <form
-                    onSubmit={handleSubmit}
-                    className="space-y-6"
-                  >
+                  <form onSubmit={handleSubmit} className="space-y-6">
                     <div className="space-y-2">
                       <Label
                         htmlFor="location"
@@ -362,9 +350,7 @@ export function PublicLanding({
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="issueType">
-                        Issue Type
-                      </Label>
+                      <Label htmlFor="issueType">Issue Type</Label>
                       <Select
                         onValueChange={(value) =>
                           setReportForm({
@@ -392,30 +378,9 @@ export function PublicLanding({
                           <SelectItem value="unregistered-carwash">
                             Unregistered Car Wash
                           </SelectItem>
-                          <SelectItem value="other">
-                            Other
-                          </SelectItem>
+                          <SelectItem value="other">Other</SelectItem>
                         </SelectContent>
                       </Select>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="description">
-                        Description
-                      </Label>
-                      <Textarea
-                        id="description"
-                        placeholder="Provide details about the issue you're reporting..."
-                        value={reportForm.description}
-                        onChange={(e) =>
-                          setReportForm({
-                            ...reportForm,
-                            description: e.target.value,
-                          })
-                        }
-                        rows={4}
-                        required
-                      />
                     </div>
 
                     <div className="space-y-4">
@@ -423,16 +388,47 @@ export function PublicLanding({
                         <Camera className="h-4 w-4 text-gray-600" />
                         <span>Photo Evidence (Optional)</span>
                       </Label>
-                      <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors cursor-pointer">
-                        <Camera className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-                        <p className="text-gray-600">
-                          Click to upload photos or drag and
-                          drop
-                        </p>
-                        <p className="text-sm text-gray-500 mt-1">
-                          PNG, JPG up to 10MB
-                        </p>
+
+                      <div
+                        onClick={handleDivClick}
+                        className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors cursor-pointer ${
+                          photo
+                            ? "border-green-400 bg-green-50"
+                            : "border-gray-300 hover:border-blue-400"
+                        }`}
+                      >
+                        {photo ? (
+                          <div>
+                            <img
+                              src={URL.createObjectURL(photo)}
+                              alt="Preview"
+                              className="mx-auto mb-2 max-h-40 rounded-md"
+                            />
+                            <p className="text-gray-600">
+                              Click again to remove
+                            </p>
+                          </div>
+                        ) : (
+                          <>
+                            <Camera className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+                            <p className="text-gray-600">
+                              Click to upload photos or drag and drop
+                            </p>
+                            <p className="text-sm text-gray-500 mt-1">
+                              PNG, JPG up to 10MB
+                            </p>
+                          </>
+                        )}
                       </div>
+
+                      {/* Hidden file input */}
+                      <input
+                        type="file"
+                        accept="image/png, image/jpeg"
+                        className="hidden"
+                        ref={fileInputRef}
+                        onChange={handleFileChange}
+                      />
                     </div>
 
                     <div className="bg-gray-50 p-4 rounded-lg">
@@ -450,16 +446,12 @@ export function PublicLanding({
                           className="mt-1"
                         />
                         <div>
-                          <Label
-                            htmlFor="anonymous"
-                            className="font-medium"
-                          >
+                          <Label htmlFor="anonymous" className="font-medium">
                             Submit Anonymously
                           </Label>
                           <p className="text-sm text-gray-600">
-                            Your identity will not be shared.
-                            You can still track your report with
-                            the provided ID.
+                            Your identity will not be shared. You can still
+                            track your report with the provided ID.
                           </p>
                         </div>
                       </div>
@@ -525,57 +517,51 @@ export function PublicLanding({
           <>
             <div className="mt-16 bg-gradient-to-r from-blue-600 to-green-600 rounded-lg shadow-lg text-white p-8">
               <div className="text-center mb-8">
-                <h3 className="text-3xl font-bold mb-4">
-                  How HydroHack Works
-                </h3>
+                <h3 className="text-3xl font-bold mb-4">How HydroHack Works</h3>
                 <p className="text-xl opacity-90 max-w-3xl mx-auto">
-                  Our integrated platform combines community
-                  reporting, IoT monitoring, and government
-                  oversight to create a comprehensive water
-                  management system.
+                  Our integrated platform combines community reporting, IoT
+                  monitoring, and government oversight to create a comprehensive
+                  water management system.
                 </p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <div className="text-center">
-                  <div className="bg-white bg-opacity-20 rounded-full p-4 w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+                  <div className="rounded-full p-4 w-16 h-16 mx-auto mb-4 flex items-center justify-center">
                     <FileText className="h-8 w-8" />
                   </div>
                   <h4 className="font-semibold text-lg mb-2">
                     1. Report Issues
                   </h4>
                   <p className="opacity-90">
-                    Citizens report water wastage, illegal
-                    dumping, and compliance violations through
-                    our easy-to-use platform.
+                    Citizens report water wastage, illegal dumping, and
+                    compliance violations through our easy-to-use platform.
                   </p>
                 </div>
 
                 <div className="text-center">
-                  <div className="bg-white bg-opacity-20 rounded-full p-4 w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+                  <div className=" rounded-full p-4 w-16 h-16 mx-auto mb-4 flex items-center justify-center">
                     <BarChart3 className="h-8 w-8" />
                   </div>
                   <h4 className="font-semibold text-lg mb-2">
                     2. Monitor & Track
                   </h4>
                   <p className="opacity-90">
-                    IoT sensors provide real-time data while
-                    government teams investigate and deploy
-                    resources efficiently.
+                    IoT sensors provide real-time data while government teams
+                    investigate and deploy resources efficiently.
                   </p>
                 </div>
 
                 <div className="text-center">
-                  <div className="bg-white bg-opacity-20 rounded-full p-4 w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+                  <div className=" rounded-full p-4 w-16 h-16 mx-auto mb-4 flex items-center justify-center">
                     <CheckCircle className="h-8 w-8" />
                   </div>
                   <h4 className="font-semibold text-lg mb-2">
                     3. Resolve & Improve
                   </h4>
                   <p className="opacity-90">
-                    Issues are resolved through enforcement,
-                    education, and support programs that benefit
-                    the entire community.
+                    Issues are resolved through enforcement, education, and
+                    support programs that benefit the entire community.
                   </p>
                 </div>
               </div>
@@ -592,20 +578,14 @@ export function PublicLanding({
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-2 gap-4 text-center">
                     <div className="bg-blue-50 p-3 rounded-lg">
-                      <p className="text-2xl font-bold text-blue-600">
-                        24/7
-                      </p>
+                      <p className="text-2xl font-bold text-blue-600">24/7</p>
                       <p className="text-sm text-gray-600">
                         Reporting Available
                       </p>
                     </div>
                     <div className="bg-green-50 p-3 rounded-lg">
-                      <p className="text-2xl font-bold text-green-600">
-                        92%
-                      </p>
-                      <p className="text-sm text-gray-600">
-                        Response Rate
-                      </p>
+                      <p className="text-2xl font-bold text-green-600">92%</p>
+                      <p className="text-sm text-gray-600">Response Rate</p>
                     </div>
                   </div>
                   <ul className="space-y-2 text-gray-600">
@@ -629,8 +609,7 @@ export function PublicLanding({
                   <Button
                     className="w-full bg-blue-600 hover:bg-blue-700"
                     onClick={() => {
-                      onRoleChange("citizen");
-                      onViewChange("register");
+                      navigate("/login-citizen");
                     }}
                   >
                     Join as Citizen Reporter
@@ -648,28 +627,18 @@ export function PublicLanding({
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-2 gap-4 text-center">
                     <div className="bg-green-50 p-3 rounded-lg">
-                      <p className="text-2xl font-bold text-green-600">
-                        R25K
-                      </p>
-                      <p className="text-sm text-gray-600">
-                        Max Subsidy
-                      </p>
+                      <p className="text-2xl font-bold text-green-600">R25K</p>
+                      <p className="text-sm text-gray-600">Max Subsidy</p>
                     </div>
                     <div className="bg-blue-50 p-3 rounded-lg">
-                      <p className="text-2xl font-bold text-blue-600">
-                        78%
-                      </p>
-                      <p className="text-sm text-gray-600">
-                        Compliance Rate
-                      </p>
+                      <p className="text-2xl font-bold text-blue-600">78%</p>
+                      <p className="text-sm text-gray-600">Compliance Rate</p>
                     </div>
                   </div>
                   <ul className="space-y-2 text-gray-600">
                     <li className="flex items-center space-x-2">
                       <CheckCircle className="h-4 w-4 text-green-500" />
-                      <span>
-                        Free registration & certification
-                      </span>
+                      <span>Free registration & certification</span>
                     </li>
                     <li className="flex items-center space-x-2">
                       <CheckCircle className="h-4 w-4 text-green-500" />
@@ -687,7 +656,7 @@ export function PublicLanding({
                   <Button
                     variant="outline"
                     className="w-full border-green-600 text-green-600 hover:bg-green-50"
-                    onClick={() => onRoleChange("operator")}
+                    onClick={() => navigate("/login", { state: { role: "" } })}
                   >
                     Register Your Business
                   </Button>
@@ -709,16 +678,9 @@ export function PublicLanding({
                 For Car Wash Operators
               </h4>
               <ul className="space-y-2 text-gray-600">
-                <li>
-                  • Register your business for compliance
-                  certification
-                </li>
-                <li>
-                  • Access water efficiency tools and tips
-                </li>
-                <li>
-                  • Qualify for green technology subsidies
-                </li>
+                <li>• Register your business for compliance certification</li>
+                <li>• Access water efficiency tools and tips</li>
+                <li>• Qualify for green technology subsidies</li>
                 <li>• Monitor your water usage and costs</li>
               </ul>
             </div>
@@ -728,13 +690,9 @@ export function PublicLanding({
                 Community Benefits
               </h4>
               <ul className="space-y-2 text-gray-600">
-                <li>
-                  • Reduced water wastage through monitoring
-                </li>
+                <li>• Reduced water wastage through monitoring</li>
                 <li>• Improved wastewater management</li>
-                <li>
-                  • Support for informal economy formalization
-                </li>
+                <li>• Support for informal economy formalization</li>
                 <li>• Environmental protection initiatives</li>
               </ul>
             </div>

@@ -698,6 +698,12 @@ export function PublicLanding({
             </div>
           </div>
         </div>
+
+        <p className="text-center text-grey-300 text-[13px] mt-8">
+          <a href="https://t.me/HYDROHACK_BOT" className=" underline">
+            Have any Questions Talk To Our 24 Hour Chat Bot
+          </a>
+        </p>
       </main>
 
       {/* Footer */}
